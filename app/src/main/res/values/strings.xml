@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Noisy Scanner</string>
+    <string name="recording_button">Recording Button</string>
 </resources>
