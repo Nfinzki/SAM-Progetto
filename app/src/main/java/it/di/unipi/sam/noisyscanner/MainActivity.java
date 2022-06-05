@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
         setContentView(R.layout.activity_main);
 
         chipNavigationBar = findViewById(R.id.navigation_bar);
+        chipNavigationBar.setOnItemSelectedListener(this);
 
         if (savedInstanceState == null) {
             Log.d("ON_CREATE", "savedInstanceState = null");
@@ -49,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
             }
         }
 
-        chipNavigationBar.setOnItemSelectedListener(this);
     }
 
     @Override
