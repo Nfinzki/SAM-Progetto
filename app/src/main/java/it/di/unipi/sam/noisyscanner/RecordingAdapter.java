@@ -21,7 +21,7 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
     @Override
     public void onBindViewHolder(@NonNull RecordViewHolder holder, int position) {
         //TODO Implementare
-        holder.city.setText("Prova");
+        holder.city.setText("Pisa");
         holder.timestamp.setText("13:20");
         holder.decibel.setText("82 Db");
     }
