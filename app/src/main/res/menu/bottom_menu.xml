@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/recording"
+        android:icon="@drawable/ic_microphone"
+        android:title="@string/recording"
+        app:cnb_iconColor="@color/black"/>
+
+    <item
+        android:id="@+id/statistics"
+        android:icon="@drawable/ic_statistics"
+        android:title="@string/statistics"
+        app:cnb_iconColor="@color/black"/>
+</menu>
