@@ -1,0 +1,10 @@
+<resources>
+    <string name="recording_button">Bottone di registrazione</string>
+    <string name="recording">Registrazioni</string>
+    <string name="statistics">Statistiche</string>
+    <string name="last_recordings">Ultime registrazioni</string>
+    <string name="loudest_hour">Ora più rumorosa</string>
+    <string name="loudest_day">Giorno più rumoroso</string>
+    <string name="loudest_month">Mese più romoroso</string>
+    <string name="loudest_city">Città più rumorosa</string>
+</resources>
