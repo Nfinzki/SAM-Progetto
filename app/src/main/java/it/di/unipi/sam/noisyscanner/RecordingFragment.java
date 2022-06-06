@@ -3,6 +3,7 @@ package it.di.unipi.sam.noisyscanner;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +30,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recent_recordings);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(new RecordingAdapter());
     }
 

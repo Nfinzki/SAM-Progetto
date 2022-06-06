@@ -1,5 +1,6 @@
 package it.di.unipi.sam.noisyscanner.database;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
@@ -11,8 +12,10 @@ public class Recording {
     @PrimaryKey(autoGenerate = true)
     public int rId;
 
-    public LocalDateTime timestamp;
-    public float decibel;
+    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
+    public String timestamp;
+
+    public double decibel;
     public int cityId;
 
 }

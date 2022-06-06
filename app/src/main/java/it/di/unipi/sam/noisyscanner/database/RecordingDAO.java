@@ -26,9 +26,12 @@ public interface RecordingDAO {
     @Query("SELECT strftime('%M', timestamp) as hour FROM Recording GROUP BY hour HAVING MAX(Recording.decibel)")
     String getLoudestHour();
 
+    @Query("INSERT INTO Recording (decibel, cityId) VALUES (:decibel, :cityId)")
+    void insertRecording(double decibel, int cityId);
+
     static class PositionRecording {
         public String city;
-        public float decibel;
-        public LocalDateTime timestamp;
+        public double decibel;
+        public String timestamp;
     }
 }

@@ -23,7 +23,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Loudest hour"
+                    android:text="@string/loudest_hour"
                     android:layout_centerHorizontal="true"
                     android:id="@+id/lh" />
                 <TextView
@@ -49,7 +49,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Loudest day"
+                android:text="@string/loudest_day"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/ld" />
             <TextView
@@ -76,12 +76,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:text="Loudest month"
+                android:text="@string/loudest_month"
                 android:id="@+id/lm" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="05/06/22"
+                android:text="Giu"
                 android:layout_centerHorizontal="true"
                 android:textSize="30sp"
                 android:id="@+id/loudest_month"
@@ -102,7 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:text="Loudest city"
+                android:text="@string/loudest_city"
                 android:id="@+id/lc" />
             <TextView
                 android:layout_width="wrap_content"
