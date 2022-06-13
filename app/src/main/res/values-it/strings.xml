@@ -7,4 +7,6 @@
     <string name="loudest_day">Giorno più rumoroso</string>
     <string name="loudest_month">Mese più romoroso</string>
     <string name="loudest_city">Città più rumorosa</string>
+    <string name="notification_title">NoisyScanner è in ascolto…</string>
+
 </resources>

@@ -9,4 +9,5 @@
     <string name="loudest_day">Loudest day</string>
     <string name="loudest_month">Loudest month</string>
     <string name="loudest_city">Loudest city</string>
+    <string name="notification_title">NoisyScanner is listening…</string>
 </resources>

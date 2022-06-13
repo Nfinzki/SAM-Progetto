@@ -10,11 +10,11 @@
     android:rowCount="2"
     android:columnCount="2">
 
-
     <com.google.android.material.card.MaterialCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
+        app:cardBackgroundColor="@color/material_light_orange"
         app:cardCornerRadius="5dp">
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -41,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
+        app:cardBackgroundColor="@color/material_light_orange"
         app:cardCornerRadius="5dp">
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -67,6 +68,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
+        app:cardBackgroundColor="@color/material_light_orange"
         app:cardCornerRadius="5dp">
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -93,6 +95,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
+        app:cardBackgroundColor="@color/material_light_orange"
         app:cardCornerRadius="5dp">
         <RelativeLayout
             android:layout_width="wrap_content"
