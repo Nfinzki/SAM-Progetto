@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 
 import java.time.LocalDateTime;
 
-@Entity(foreignKeys = @ForeignKey(entity=City.class, parentColumns = "cId", childColumns = "cityId"))
+@Entity
 public class Recording {
     @PrimaryKey(autoGenerate = true)
     public int rId;
@@ -16,6 +16,6 @@ public class Recording {
     public String timestamp;
 
     public double decibel;
-    public int cityId;
+    public String city;
 
 }

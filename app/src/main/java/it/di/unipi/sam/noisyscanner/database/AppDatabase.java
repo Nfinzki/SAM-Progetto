@@ -6,7 +6,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Recording.class, City.class}, version = 1)
+@Database(entities = {Recording.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract RecordingDAO recordingDAO();
 
@@ -17,6 +17,7 @@ public abstract class AppDatabase extends RoomDatabase {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "Recording_DB")
                     .build();
         }
+
         return INSTANCE;
     }
 }
