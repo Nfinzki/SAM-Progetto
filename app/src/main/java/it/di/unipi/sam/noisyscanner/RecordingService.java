@@ -5,11 +5,15 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Geocoder;
 import android.os.Binder;
 import android.os.IBinder;
 import android.view.View;
 
 import androidx.core.app.NotificationCompat;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 
 public class RecordingService extends Service {
     public static final int STOPPED = 0;
@@ -18,6 +22,9 @@ public class RecordingService extends Service {
     private NotificationManager notificationManager;
     private NotificationCompat.Builder builder;
     private final IBinder binder = new RecordingBinder();
+    private FusedLocationProviderClient fusedLocationClient;
+    private Geocoder geocoder;
+
     private int state = STOPPED; //Not recording
     private Thread thread = null;
     private OnStateChangedListener listener;
@@ -27,7 +34,7 @@ public class RecordingService extends Service {
 
     public class RecordingBinder extends Binder {
 
-        void startRecording(View v, OnStateChangedListener lst) {
+        void startRecording(View v, OnStateChangedListener lst, OnNewDataListener dataListener) {
             view = v;
             listener = lst;
 
@@ -36,7 +43,7 @@ public class RecordingService extends Service {
 
             notificationManager.notify(notificationId, notification);
 
-            thread = new Thread(new RecordingJob(context));
+            thread = new Thread(new RecordingJob(context, fusedLocationClient, geocoder, dataListener));
             thread.start();
             state = RECORDING; //Recording
             listener.onStateChanged(view, state);
@@ -64,6 +71,10 @@ public class RecordingService extends Service {
                 .setContentTitle(getText(R.string.notification_title))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setOngoing(true);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        geocoder = Geocoder.isPresent() ? new Geocoder(this) : null;
     }
 
     @Override
@@ -86,5 +97,9 @@ public class RecordingService extends Service {
 
     public interface OnStateChangedListener {
         void onStateChanged(View view, int state);
+    }
+
+    public interface OnNewDataListener {
+        void onNewData(double decibel, String timestamp, String city);
     }
 }
