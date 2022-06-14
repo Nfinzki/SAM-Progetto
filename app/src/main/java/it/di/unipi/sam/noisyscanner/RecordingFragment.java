@@ -1,25 +1,35 @@
 package it.di.unipi.sam.noisyscanner;
 
-import android.app.Notification;
-import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 
-import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class RecordingFragment extends Fragment implements View.OnClickListener {
+public class RecordingFragment extends Fragment implements View.OnClickListener, RecordingService.OnStateChangedListener {
+    private RecordingService.RecordingBinder recordingService = null;
+    private final ServiceConnection recordingConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            recordingService = (RecordingService.RecordingBinder) iBinder;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            recordingService = null;
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -30,6 +40,9 @@ public class RecordingFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        Context context = view.getContext();
+        context.bindService(new Intent(context, RecordingService.class), recordingConnection, Context.BIND_AUTO_CREATE);
+
         FloatingActionButton button = (FloatingActionButton) view.findViewById(R.id.micButton);
         button.setOnClickListener(this);
 
@@ -43,17 +56,28 @@ public class RecordingFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onClick(View view) {
         FloatingActionButton button = (FloatingActionButton) view;
-        Context context = view.getContext();
 
-        if (button.getTag().equals("rec")) {
-            button.setImageResource(R.drawable.ic_stop);
-            button.setTag("stop");
+        if (recordingService != null) {
+            switch (recordingService.getState()) {
+                case RecordingService.STOPPED:
+                    recordingService.startRecording(view, this);
+                    break;
+                case RecordingService.RECORDING:
+                    recordingService.stopRecording();
+            }
+        }
+    }
 
-            Intent i = new Intent(context, RecordingService.class);
-            context.startService(i);
-        } else {
-            button.setImageResource(R.drawable.ic_microphone);
-            button.setTag("rec");
+    @Override
+    public void onStateChanged(View view, int state) {
+        FloatingActionButton button = (FloatingActionButton)view.findViewById(R.id.micButton);
+
+        switch (state) {
+            case RecordingService.STOPPED:
+                button.setImageResource(R.drawable.ic_microphone);
+                break;
+            case RecordingService.RECORDING:
+                button.setImageResource(R.drawable.ic_stop);
         }
     }
 }
