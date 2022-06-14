@@ -2,7 +2,6 @@ package it.di.unipi.sam.noisyscanner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.helper.widget.Carousel;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -15,8 +14,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
-
-import static android.Manifest.permission.RECORD_AUDIO;
 
 public class MainActivity extends AppCompatActivity implements ChipNavigationBar.OnItemSelectedListener {
     private ChipNavigationBar chipNavigationBar;
@@ -61,9 +58,12 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
 
         createNotificationChannel();
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 0);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
         }
     }
 
