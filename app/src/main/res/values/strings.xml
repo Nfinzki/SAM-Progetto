@@ -10,4 +10,8 @@
     <string name="loudest_month">Loudest month</string>
     <string name="loudest_city">Loudest city</string>
     <string name="notification_title">NoisyScanner is listening…</string>
+    <string name="location_not_available">Location not available</string>
+    <string name="decibel">Decibel: </string>
+    <string name="city">City: </string>
+    <string name="timestamp">Timestamp: </string>
 </resources>

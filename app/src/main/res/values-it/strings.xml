@@ -8,5 +8,8 @@
     <string name="loudest_month">Mese più romoroso</string>
     <string name="loudest_city">Città più rumorosa</string>
     <string name="notification_title">NoisyScanner è in ascolto…</string>
-
+    <string name="location_not_available">Luogo non disponibile</string>
+    <string name="decibel">Decibel: </string>
+    <string name="city">Città: </string>
+    <string name="timestamp">Data e ora: </string>
 </resources>
