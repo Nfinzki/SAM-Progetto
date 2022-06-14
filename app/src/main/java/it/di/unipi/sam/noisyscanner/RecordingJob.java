@@ -30,42 +30,46 @@ public class RecordingJob implements Runnable {
             e.printStackTrace();
         }
 
-        //mediaRecorder.getMaxAmplitude();
-
         while(!Thread.currentThread().isInterrupted()) {
             int maxAmplitude = mediaRecorder.getMaxAmplitude();
-
             if (maxAmplitude != 0) {
-                Log.d("AMPL", maxAmplitude + "");
-
-                decibelSum += 20 * Math.log10((double)Math.abs(maxAmplitude));
+                decibelSum += getDecibel(maxAmplitude);
                 numSum++;
 
                 Log.d("DB", decibelSum + "");
-
-                if (numSum >= 5) break;
             }
+
 
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
-                //TODO Ultima lettura
-                double avgDecibels = decibelSum / numSum;
-                //TODO Insert into DB
+                maxAmplitude = mediaRecorder.getMaxAmplitude();
+                if (maxAmplitude != 0) {
+                    decibelSum += getDecibel(maxAmplitude);
+                    numSum++;
 
-                mediaRecorder.stop();
-                mediaRecorder.release();
-                mediaRecorder = null;
+                    Log.d("DB", decibelSum + "");
+                }
 
+                Log.d("REC", "Interrupted");
+                break;
             }
         }
-
-        double avgDecibels = decibelSum / numSum;
-        Log.d("Db AVG", avgDecibels + "");
 
         mediaRecorder.stop();
 
         mediaRecorder.release();
         mediaRecorder = null;
+
+        double avgDecibels = decibelSum / numSum;
+        Log.d("Db AVG", avgDecibels + "");
+        //TODO Insert into DB
+    }
+
+    private double getDecibel(int maxAmplitude) {
+        Log.d("AMPL", maxAmplitude + "");
+
+        //Qui ci vorrebbe la calibrazione con uno strumento esterno
+        return  20 * Math.log10((double) Math.abs(maxAmplitude));
     }
 }
