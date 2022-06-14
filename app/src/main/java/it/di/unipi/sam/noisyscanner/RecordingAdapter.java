@@ -10,7 +10,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.List;
+
+import it.di.unipi.sam.noisyscanner.database.Recording;
+
 public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.RecordViewHolder> {
+    List<Recording> recordings;
+
+    public RecordingAdapter(List<Recording> recordings) {
+        this.recordings = recordings;
+    }
+
+    public void setRecordings(List<Recording> recordings) {
+        this.recordings = recordings;
+    }
+
     @NonNull
     @Override
     public RecordViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -20,15 +34,15 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
 
     @Override
     public void onBindViewHolder(@NonNull RecordViewHolder holder, int position) {
-        //TODO Implementare
-        holder.city.setText("Pisa");
-        holder.timestamp.setText("13:20");
-        holder.decibel.setText("82 Db");
+        holder.city.setText(recordings.get(position).city);
+        holder.timestamp.setText(recordings.get(position).timestamp);
+        String decibel = recordings.get(position).decibel + "";
+        holder.decibel.setText(decibel);
     }
 
     @Override
     public int getItemCount() {
-        return 20; //TODO Modificare
+        return recordings.size();
     }
 
     public static class RecordViewHolder extends RecyclerView.ViewHolder {
