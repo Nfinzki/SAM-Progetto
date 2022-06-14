@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,7 +18,13 @@ import android.view.ViewGroup;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class RecordingFragment extends Fragment implements View.OnClickListener, RecordingService.OnStateChangedListener {
+import java.util.List;
+
+import it.di.unipi.sam.noisyscanner.database.AppDatabase;
+import it.di.unipi.sam.noisyscanner.database.Recording;
+
+public class RecordingFragment extends Fragment implements View.OnClickListener,
+        RecordingService.OnStateChangedListener, RecordingService.OnNewDataListener {
     private RecordingService.RecordingBinder recordingService = null;
     private final ServiceConnection recordingConnection = new ServiceConnection() {
         @Override
@@ -50,7 +57,13 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         //recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
-        recyclerView.setAdapter(new RecordingAdapter());
+
+        //recyclerView.setAdapter(new RecordingAdapter());
+
+        new Thread(() -> {
+            List<Recording> recordings = AppDatabase.getDatabaseInstance(context).recordingDAO().getRecentRecordings(20);
+            recyclerView.post(() -> recyclerView.setAdapter(new RecordingAdapter(recordings)));
+        }).start();
     }
 
     @Override
@@ -60,7 +73,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         if (recordingService != null) {
             switch (recordingService.getState()) {
                 case RecordingService.STOPPED:
-                    recordingService.startRecording(view, this);
+                    recordingService.startRecording(view, this, this);
                     break;
                 case RecordingService.RECORDING:
                     recordingService.stopRecording();
@@ -79,5 +92,27 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
             case RecordingService.RECORDING:
                 button.setImageResource(R.drawable.ic_stop);
         }
+    }
+
+    @Override
+    public void onNewData(double decibel, String timestamp, String city) {
+        FragmentManager fm = requireActivity().getSupportFragmentManager();
+
+        ResultDialog resultDialog = new ResultDialog(decibel, timestamp, city);
+        resultDialog.show(fm, "Result Dialog");
+
+        RecyclerView rv = requireView().findViewById(R.id.recent_recordings);
+        RecordingAdapter ra = (RecordingAdapter) rv.getAdapter();
+        new Thread(() -> {
+            List<Recording> recordings = AppDatabase.getDatabaseInstance(getContext()).recordingDAO().getRecentRecordings(20);
+
+            rv.post(() -> {
+                if (ra != null) {
+                    ra.setRecordings(recordings);
+                    ra.notifyDataSetChanged();
+                }
+            });
+        }).start();
+
     }
 }
