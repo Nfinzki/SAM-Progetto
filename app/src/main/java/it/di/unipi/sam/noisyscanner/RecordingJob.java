@@ -93,6 +93,7 @@ public class RecordingJob implements Runnable {
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             db.recordingDAO().insertRecording(avgDecibels, (String)context.getText(R.string.location_not_available));
+            newDataListener.onNewData(avgDecibels, "TimeStamp", (String) context.getText(R.string.location_not_available)); //TODO Aggiungere il timestamp
         } else {
             double finalAvgDecibels = avgDecibels;
 
