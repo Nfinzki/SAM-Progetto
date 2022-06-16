@@ -25,6 +25,7 @@ import it.di.unipi.sam.noisyscanner.database.Recording;
 
 public class RecordingFragment extends Fragment implements View.OnClickListener,
         RecordingService.OnStateChangedListener, RecordingService.OnNewDataListener {
+
     private RecordingService.RecordingBinder recordingService = null;
     private final ServiceConnection recordingConnection = new ServiceConnection() {
         @Override
@@ -37,6 +38,12 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
             recordingService = null;
         }
     };
+    private final int maxLastRecordings = 20;
+
+    public static Fragment newInstance() {
+        RecordingFragment rf = new RecordingFragment();
+        return rf;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,20 +63,17 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recent_recordings);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        //recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
-
-        //recyclerView.setAdapter(new RecordingAdapter());
-
+        RecordingAdapter adapter = new RecordingAdapter();
+        recyclerView.setAdapter(adapter);
         new Thread(() -> {
-            List<Recording> recordings = AppDatabase.getDatabaseInstance(context).recordingDAO().getRecentRecordings(20);
-            recyclerView.post(() -> recyclerView.setAdapter(new RecordingAdapter(recordings)));
+            List<Recording> recordings = AppDatabase.getDatabaseInstance(context).recordingDAO().getRecentRecordings(maxLastRecordings);
+            adapter.setRecordings(recordings);
+            adapter.notifyDataSetChanged();
         }).start();
     }
 
     @Override
     public void onClick(View view) {
-        FloatingActionButton button = (FloatingActionButton) view;
-
         if (recordingService != null) {
             switch (recordingService.getState()) {
                 case RecordingService.STOPPED:
@@ -98,13 +102,15 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
     public void onNewData(double decibel, String timestamp, String city) {
         FragmentManager fm = requireActivity().getSupportFragmentManager();
 
-        ResultDialog resultDialog = new ResultDialog(decibel, timestamp, city);
-        resultDialog.show(fm, "Result Dialog");
+        if (((MainActivity)getActivity()).getVisibility()) {
+            ResultDialog resultDialog = new ResultDialog(decibel, timestamp, city);
+            resultDialog.show(fm, "Result Dialog");
+        }
 
         RecyclerView rv = requireView().findViewById(R.id.recent_recordings);
         RecordingAdapter ra = (RecordingAdapter) rv.getAdapter();
         new Thread(() -> {
-            List<Recording> recordings = AppDatabase.getDatabaseInstance(getContext()).recordingDAO().getRecentRecordings(20);
+            List<Recording> recordings = AppDatabase.getDatabaseInstance(getContext()).recordingDAO().getRecentRecordings(maxLastRecordings);
 
             rv.post(() -> {
                 if (ra != null) {
