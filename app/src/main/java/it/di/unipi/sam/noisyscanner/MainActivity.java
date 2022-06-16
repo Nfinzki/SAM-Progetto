@@ -17,6 +17,7 @@ import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
 public class MainActivity extends AppCompatActivity implements ChipNavigationBar.OnItemSelectedListener {
     private ChipNavigationBar chipNavigationBar;
+    private boolean visible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
             chipNavigationBar.setItemSelected(R.id.recording, true);
 
             getSupportFragmentManager().beginTransaction()
-                .replace(R.id.placeholder, new RecordingFragment())
+                .replace(R.id.placeholder, RecordingFragment.newInstance())
                 .commit();
         } else {
             Log.d("ON_CREATE", "savedInstanceState = " + savedInstanceState.get("ChipNavBar"));
@@ -41,11 +42,12 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
 
             Fragment fragment = null;
             switch (savedInstanceState.getInt("ChipNavBar")) {
-                case R.id.recording:
-                    fragment = new RecordingFragment();
+                case R.id.recording: {
+                    fragment = RecordingFragment.newInstance();
                     break;
+                }
                 case R.id.statistics:
-                    fragment = new StatisticFragment();
+                    fragment = StatisticFragment.newInstance();
                     break;
             }
 
@@ -65,6 +67,26 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("ACTIVITY_LC", "Inside onStop");
+
+        visible = false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("ACTIVITY_LC", "Inside onStart");
+
+        visible = true;
+    }
+
+    public boolean getVisibility() {
+        return visible;
     }
 
     @Override
