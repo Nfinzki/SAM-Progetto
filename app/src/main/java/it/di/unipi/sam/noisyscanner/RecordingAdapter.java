@@ -17,10 +17,6 @@ import it.di.unipi.sam.noisyscanner.database.Recording;
 public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.RecordViewHolder> {
     List<Recording> recordings;
 
-    public RecordingAdapter(List<Recording> recordings) {
-        this.recordings = recordings;
-    }
-
     public void setRecordings(List<Recording> recordings) {
         this.recordings = recordings;
     }
