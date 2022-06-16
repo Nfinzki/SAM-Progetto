@@ -2,12 +2,14 @@ package it.di.unipi.sam.noisyscanner;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Geocoder;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 
 import androidx.core.app.NotificationCompat;
@@ -50,10 +52,7 @@ public class RecordingService extends Service {
         }
 
         void stopRecording() {
-            thread.interrupt();
-            notificationManager.cancel(notificationId);
-            state = STOPPED; //Not recording
-            listener.onStateChanged(view, state);
+            stop();
         }
 
         int getState() {
@@ -66,15 +65,27 @@ public class RecordingService extends Service {
         super.onCreate();
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        builder = new NotificationCompat.Builder(this, "MyChannel")
+        Intent intent = new Intent(getApplicationContext(), RecordingService.class);
+        Intent activityIntent = new Intent(getApplicationContext(), MainActivity.class);
+
+        builder = new NotificationCompat.Builder(this, "MyChannel") //TODO Aggiungere l'azione e il fatto che se si clicca parte la main activity
                 .setSmallIcon(R.drawable.ic_microphone)
                 .setContentTitle(getText(R.string.notification_title))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(PendingIntent.getActivity(this, 3, activityIntent, 0))
+                .addAction(R.drawable.ic_stop, getText(R.string.stop), PendingIntent.getService(this, 2, intent, 0))
                 .setOngoing(true);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         geocoder = Geocoder.isPresent() ? new Geocoder(this) : null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("NOTIF_STOP", "Calling stop");
+        stop();
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -85,6 +96,7 @@ public class RecordingService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d("REC_SERVICE", "Inside onDestroy");
 
         if (thread != null) {
             thread.interrupt();
@@ -101,5 +113,14 @@ public class RecordingService extends Service {
 
     public interface OnNewDataListener {
         void onNewData(double decibel, String timestamp, String city);
+    }
+
+    public void stop() {
+        if (thread != null) {
+            thread.interrupt();
+        }
+        notificationManager.cancel(notificationId);
+        state = STOPPED; //Not recording
+        listener.onStateChanged(view, state);
     }
 }
