@@ -19,6 +19,11 @@ import it.di.unipi.sam.noisyscanner.database.AppDatabase;
  */
 public class StatisticFragment extends Fragment {
 
+    public static Fragment newInstance() {
+        StatisticFragment sf = new StatisticFragment();
+        return sf;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
