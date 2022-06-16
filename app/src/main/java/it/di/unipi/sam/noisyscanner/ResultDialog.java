@@ -25,7 +25,6 @@ public class ResultDialog extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.result_dialog, container, false);
-        getDialog().setTitle("Dialog di prova");
 
         TextView decibelText = (TextView) v.findViewById(R.id.registeredDecibel);
         TextView cityText = (TextView) v.findViewById(R.id.registeredCity);
