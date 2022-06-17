@@ -16,8 +16,9 @@
         android:layout_weight="1"
         android:layout_gravity="center"
         android:src="@drawable/ic_microphone"
-        android:scaleX="4"
-        android:scaleY="4"
+        android:scaleX="3"
+        android:scaleY="3"
+        android:layout_marginTop="50dp"
         android:tag="rec"
         android:contentDescription="@string/recording_button"
         />
@@ -28,14 +29,15 @@
         android:text="@string/last_recordings"
         android:layout_gravity="center"
         android:textSize="27sp"
-        android:layout_marginTop="125dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="25dp"
          />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recent_recordings"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="2">
     </androidx.recyclerview.widget.RecyclerView>
 
 </LinearLayout>
