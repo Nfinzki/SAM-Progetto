@@ -38,7 +38,7 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
 
     @Override
     public int getItemCount() {
-        return recordings.size();
+        return recordings == null ? 0 : recordings.size();
     }
 
     public static class RecordViewHolder extends RecyclerView.ViewHolder {
