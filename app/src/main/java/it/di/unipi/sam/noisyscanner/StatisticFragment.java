@@ -72,7 +72,7 @@ public class StatisticFragment extends Fragment {
             RecordingDAO.Result lc = db.recordingDAO().getLoudestCity();
 
             adapter.setData(lh, ld, lm, lc);
-            adapter.notifyDataSetChanged();
+            recyclerView.post(() -> adapter.notifyDataSetChanged());
         }).start();
 
         configureChart();
