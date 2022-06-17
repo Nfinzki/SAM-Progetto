@@ -59,14 +59,7 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
         }
 
         createNotificationChannel();
-
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
-        }
+        checkAndRequestPermissions();
     }
 
     @Override
@@ -103,11 +96,11 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
 
         switch (i) {
             case R.id.recording:
-                fragment = new RecordingFragment();
+                fragment = RecordingFragment.newInstance();
                 break;
 
             case R.id.statistics:
-                fragment = new StatisticFragment();
+                fragment = StatisticFragment.newInstance();
                 break;
         }
 
@@ -131,6 +124,16 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void checkAndRequestPermissions() {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
         }
     }
 }
