@@ -10,19 +10,23 @@ public interface RecordingDAO {
     @Query("SELECT * FROM Recording ORDER BY timestamp DESC LIMIT :limit")
     List<Recording> getRecentRecordings(int limit);
 
-    @Query("SELECT city FROM Recording " +
-            "GROUP BY city HAVING MAX(decibel)")
-    String getLoudestCity();
+    @Query("SELECT city AS value, max(decibel) AS maxDecibel FROM Recording")
+    Result getLoudestCity();
 
-    @Query("SELECT strftime('%m', timestamp) AS month FROM Recording GROUP BY month HAVING MAX(Recording.decibel)")
-    String getLoudestMonth();
+    @Query("SELECT strftime('%m', timestamp) AS value, max(decibel) AS maxDecibel FROM Recording")
+    Result getLoudestMonth();
 
-    @Query("SELECT strftime('%d-%m-%Y', timestamp) as day FROM Recording GROUP BY day HAVING MAX(Recording.decibel)")
-    String getLoudestDay();
+    @Query("SELECT strftime('%d-%m-%Y', timestamp) AS value, MAX(decibel) AS maxDecibel FROM Recording")
+    Result getLoudestDay();
 
-    @Query("SELECT strftime('%H', timestamp) as hour FROM Recording GROUP BY hour HAVING MAX(Recording.decibel)")
-    String getLoudestHour();
+    @Query("SELECT strftime('%H', timestamp) AS value, MAX(decibel) AS maxDecibel FROM Recording")
+    Result getLoudestHour();
 
     @Query("INSERT INTO Recording (decibel, city) VALUES (:decibel, :city)")
     void insertRecording(double decibel, String city);
+
+    static class Result {
+        public String value;
+        public double maxDecibel;
+    }
 }

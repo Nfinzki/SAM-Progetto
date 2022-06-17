@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 import it.di.unipi.sam.noisyscanner.database.AppDatabase;
+import it.di.unipi.sam.noisyscanner.database.RecordingDAO;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,10 +66,10 @@ public class StatisticFragment extends Fragment {
         new Thread(() -> {
             AppDatabase db = AppDatabase.getDatabaseInstance(context);
 
-            String lh = db.recordingDAO().getLoudestHour();
-            String ld = db.recordingDAO().getLoudestDay();
-            String lm = db.recordingDAO().getLoudestMonth();
-            String lc = db.recordingDAO().getLoudestCity();
+            RecordingDAO.Result lh = db.recordingDAO().getLoudestHour();
+            RecordingDAO.Result ld = db.recordingDAO().getLoudestDay();
+            RecordingDAO.Result lm = db.recordingDAO().getLoudestMonth();
+            RecordingDAO.Result lc = db.recordingDAO().getLoudestCity();
 
             adapter.setData(lh, ld, lm, lc);
             adapter.notifyDataSetChanged();
