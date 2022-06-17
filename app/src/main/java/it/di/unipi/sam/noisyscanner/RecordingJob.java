@@ -97,7 +97,7 @@ public class RecordingJob implements Runnable {
             double finalAvgDecibels = avgDecibels;
 
             fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-                String registeredLocation = null;
+                String registeredLocation;
                 Log.d("LOC", location.toString());
 
                 List<Address> addressList = null;
@@ -112,6 +112,8 @@ public class RecordingJob implements Runnable {
                         Address address = addressList.get(0);
                         Log.d("GEO", address.getLocality());
                         registeredLocation = address.getLocality();
+                    } else {
+                        registeredLocation = location.getLatitude() + " " + location.getLongitude();
                     }
                 } else {
                     registeredLocation = location.getLatitude() + " " + location.getLongitude();

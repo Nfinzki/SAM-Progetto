@@ -43,7 +43,7 @@ public class RecordingService extends Service {
             Context context = view.getContext();
             Notification notification = builder.build();
 
-            notificationManager.notify(notificationId, notification);
+            startForeground(notificationId, notification);
 
             thread = new Thread(new RecordingJob(context, fusedLocationClient, geocoder, dataListener));
             thread.start();
@@ -119,7 +119,8 @@ public class RecordingService extends Service {
         if (thread != null) {
             thread.interrupt();
         }
-        notificationManager.cancel(notificationId);
+
+        stopForeground(true);
         state = STOPPED; //Not recording
         listener.onStateChanged(view, state);
     }
