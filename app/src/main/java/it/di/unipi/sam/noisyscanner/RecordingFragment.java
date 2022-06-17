@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.IBinder;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +69,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         new Thread(() -> {
             List<Recording> recordings = AppDatabase.getDatabaseInstance(context).recordingDAO().getRecentRecordings(maxLastRecordings);
             adapter.setRecordings(recordings);
-            adapter.notifyDataSetChanged();
+            recyclerView.post(() -> adapter.notifyDataSetChanged());
         }).start();
     }
 

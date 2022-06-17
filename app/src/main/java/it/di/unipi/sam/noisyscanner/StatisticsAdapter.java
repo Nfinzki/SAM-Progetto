@@ -69,7 +69,10 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.St
 
     @Override
     public int getItemCount() {
-        return numStatistics;
+        if (loudestHour != null && loudestDay != null && loudestMonth != null && loudestCity != null)
+            return numStatistics;
+        else
+            return 0;
     }
 
     public static class StatisticViewHolder extends RecyclerView.ViewHolder {
