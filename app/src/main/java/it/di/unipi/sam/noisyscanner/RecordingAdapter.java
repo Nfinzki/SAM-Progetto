@@ -32,7 +32,7 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
     public void onBindViewHolder(@NonNull RecordViewHolder holder, int position) {
         holder.city.setText(recordings.get(position).city);
         holder.timestamp.setText(recordings.get(position).timestamp);
-        String decibel = recordings.get(position).decibel + "";
+        String decibel = recordings.get(position).decibel + " Db";
         holder.decibel.setText(decibel);
     }
 
