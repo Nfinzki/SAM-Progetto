@@ -92,8 +92,7 @@ public class RecordingJob implements Runnable {
         }
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            db.recordingDAO().insertRecording(avgDecibels, (String)context.getText(R.string.location_not_available));
-            newDataListener.onNewData(avgDecibels, "TimeStamp", (String) context.getText(R.string.location_not_available)); //TODO Aggiungere il timestamp
+            addRecWithNoLocation(avgDecibels);
         } else {
             double finalAvgDecibels = avgDecibels;
 
@@ -132,5 +131,10 @@ public class RecordingJob implements Runnable {
 
         //Qui ci vorrebbe la calibrazione con uno strumento esterno
         return  20 * Math.log10((double) Math.abs(maxAmplitude));
+    }
+
+    private void addRecWithNoLocation(double avgDecibels) {
+        db.recordingDAO().insertRecording(avgDecibels, (String)context.getText(R.string.location_not_available));
+        newDataListener.onNewData(avgDecibels, "TimeStamp", (String) context.getText(R.string.location_not_available)); //TODO Aggiungere il timestamp
     }
 }
