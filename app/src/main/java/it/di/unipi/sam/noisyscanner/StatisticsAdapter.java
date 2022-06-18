@@ -1,6 +1,5 @@
 package it.di.unipi.sam.noisyscanner;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,22 +42,22 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.St
             case 0:
                 title = "Loudest Hour";
                 value = loudestHour.value;
-                maxDecibel = loudestHour.maxDecibel + " Db";
+                maxDecibel = loudestHour.decibel + " Db";
                 break;
             case 1:
                 title = "Loudest Day";
                 value = loudestDay.value;
-                maxDecibel = loudestDay.maxDecibel + " Db";
+                maxDecibel = loudestDay.decibel + " Db";
                 break;
             case 2:
                 title = "Loudest Month";
                 value = loudestMonth.value;
-                maxDecibel = loudestMonth.maxDecibel + " Db";
+                maxDecibel = loudestMonth.decibel + " Db";
                 break;
             case 3:
                 title = "Loudest City";
                 value = loudestCity.value;
-                maxDecibel = loudestCity.maxDecibel + " Db";
+                maxDecibel = loudestCity.decibel + " Db";
                 break;
         }
 
