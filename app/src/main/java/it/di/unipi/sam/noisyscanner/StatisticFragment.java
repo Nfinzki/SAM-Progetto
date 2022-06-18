@@ -1,6 +1,8 @@
 package it.di.unipi.sam.noisyscanner;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,10 +15,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -37,7 +44,7 @@ import it.di.unipi.sam.noisyscanner.database.RecordingDAO;
  * create an instance of this fragment.
  */
 public class StatisticFragment extends Fragment {
-    private LineChart chart;
+    private BarChart chart;
 
     public static Fragment newInstance() {
         StatisticFragment sf = new StatisticFragment();
@@ -55,7 +62,7 @@ public class StatisticFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         Context context = view.getContext();
 
-        chart = (LineChart) view.findViewById(R.id.chart);
+        chart = (BarChart) view.findViewById(R.id.chart);
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.statistic_view);
         recyclerView.setHasFixedSize(true);
@@ -95,28 +102,56 @@ public class StatisticFragment extends Fragment {
 
         chart.getLegend().setEnabled(false);
 
+        Resources res = getResources();
+
         xAxis.setValueFormatter(new ValueFormatter() {
             private final SimpleDateFormat mFormat = new SimpleDateFormat("dd MMM", Locale.ENGLISH);
 
+            final String[] month = res.getStringArray(R.array.months);
+
             @Override
-            public String getFormattedValue(float value) {
-                long millis = (long) value * 1000L;
-                return mFormat.format(new Date(millis));
+            public String getAxisLabel(float value, AxisBase axis) {
+                return month[Math.round(value)];
             }
         });
 
-        List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(1, 1));
-        entries.add(new Entry(2, (float) 3.4));
-        entries.add(new Entry(3, (float) 4.2));
-        entries.add(new Entry(4, (float) 7.1));
-        entries.add(new Entry(5, (float) 6.4));
+        new Thread(() -> {
+            AppDatabase db = AppDatabase.getDatabaseInstance(getContext());
+            List<RecordingDAO.Result> results =  db.recordingDAO().getAvgPerMonth("2022");
 
-        LineDataSet dataSet = new LineDataSet(entries, "Dati di prova");
+            List<BarEntry> entries = new ArrayList<>();
 
-        LineData lineData = new LineData(dataSet);
+            for (RecordingDAO.Result result : results) {
+                entries.add(new BarEntry(getMonthIndex(result.value), (float) result.decibel));
+            }
 
-        chart.setData(lineData);
-        chart.invalidate();
+            BarDataSet dataSet = new BarDataSet(entries, "Dati di prova");
+
+
+            BarData barData = new BarData(dataSet);
+
+            chart.setData(barData);
+            chart.post(() -> chart.invalidate());
+        }).start();
+
+    }
+
+    private int getMonthIndex(String month) {
+        switch (month) {
+            case "01": return 0;
+            case "02": return 1;
+            case "03": return 2;
+            case "04": return 3;
+            case "05": return 4;
+            case "06": return 5;
+            case "07": return 6;
+            case "08": return 7;
+            case "09": return 8;
+            case "10": return 9;
+            case "11": return 10;
+            case "12": return 11;
+        }
+
+        return 0;
     }
 }
