@@ -105,8 +105,6 @@ public class StatisticFragment extends Fragment {
         Resources res = getResources();
 
         xAxis.setValueFormatter(new ValueFormatter() {
-            private final SimpleDateFormat mFormat = new SimpleDateFormat("dd MMM", Locale.ENGLISH);
-
             final String[] month = res.getStringArray(R.array.months);
 
             @Override
