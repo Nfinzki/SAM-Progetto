@@ -29,11 +29,8 @@ public interface RecordingDAO {
             "WHERE strftime('%Y', timestamp) = :year GROUP BY value")
     List<Result> getAvgPerMonth(String year);
 
-    @Query("SELECT MIN(strftime('%Y', timestamp)) FROM Recording")
-    String getMinYear();
-
-    @Query("SELECT MAX(strftime('%Y', timestamp)) FROM Recording")
-    String getMaxYear();
+    @Query("SELECT strftime('%Y', timestamp) AS years FROM Recording GROUP BY years ORDER BY years")
+    List<String> getAllYears();
 
     static class Result {
         public String value;
