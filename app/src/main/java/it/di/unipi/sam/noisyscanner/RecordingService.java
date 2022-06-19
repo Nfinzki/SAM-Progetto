@@ -68,7 +68,7 @@ public class RecordingService extends Service {
         Intent intent = new Intent(getApplicationContext(), RecordingService.class);
         Intent activityIntent = new Intent(getApplicationContext(), MainActivity.class);
 
-        builder = new NotificationCompat.Builder(this, "MyChannel") //TODO Aggiungere l'azione e il fatto che se si clicca parte la main activity
+        builder = new NotificationCompat.Builder(this, "MyChannel")
                 .setSmallIcon(R.drawable.ic_microphone)
                 .setContentTitle(getText(R.string.notification_title))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
