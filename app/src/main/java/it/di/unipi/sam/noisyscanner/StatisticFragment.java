@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -45,6 +47,7 @@ import it.di.unipi.sam.noisyscanner.database.RecordingDAO;
  */
 public class StatisticFragment extends Fragment {
     private BarChart chart;
+    private Spinner spinner;
 
     public static Fragment newInstance() {
         StatisticFragment sf = new StatisticFragment();
