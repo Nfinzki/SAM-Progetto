@@ -3,6 +3,8 @@ package it.di.unipi.sam.noisyscanner;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteCursor;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,7 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -45,13 +49,17 @@ import it.di.unipi.sam.noisyscanner.database.RecordingDAO;
  * Use the {@link StatisticFragment#} factory method to
  * create an instance of this fragment.
  */
-public class StatisticFragment extends Fragment {
+public class StatisticFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+    private static StatisticFragment INSTANCE = null;
+
     private BarChart chart;
     private Spinner spinner;
 
-    public static Fragment newInstance() {
-        StatisticFragment sf = new StatisticFragment();
-        return sf;
+    public static Fragment getInstance() {
+        if (INSTANCE == null)
+            INSTANCE = new StatisticFragment();
+
+        return INSTANCE;
     }
 
     @Override
@@ -64,6 +72,14 @@ public class StatisticFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         Context context = view.getContext();
+
+        spinner = (Spinner) view.findViewById(R.id.yearSpinner);
+        spinner.setOnItemSelectedListener(this);
+        SimpleCursorAdapter yearAdapter = new SimpleCursorAdapter(context,
+                android.R.layout.simple_spinner_item,
+                null,
+                new String[] {"_id"},
+                new int[] {android.R.id.text1});
 
         chart = (BarChart) view.findViewById(R.id.chart);
 
@@ -80,6 +96,12 @@ public class StatisticFragment extends Fragment {
             RecordingDAO.Result ld = db.recordingDAO().getLoudestDay();
             RecordingDAO.Result lm = db.recordingDAO().getLoudestMonth();
             RecordingDAO.Result lc = db.recordingDAO().getLoudestCity();
+
+            Cursor cur = db.recordingDAO().getAllYears();
+            yearAdapter.changeCursor(cur);
+
+            spinner.post(() -> spinner.setAdapter(yearAdapter));
+
 
             adapter.setData(lh, ld, lm, lc);
             recyclerView.post(() -> adapter.notifyDataSetChanged());
@@ -115,26 +137,6 @@ public class StatisticFragment extends Fragment {
                 return month[Math.round(value)];
             }
         });
-
-        new Thread(() -> {
-            AppDatabase db = AppDatabase.getDatabaseInstance(getContext());
-            List<RecordingDAO.Result> results =  db.recordingDAO().getAvgPerMonth("2022");
-
-            List<BarEntry> entries = new ArrayList<>();
-
-            for (RecordingDAO.Result result : results) {
-                entries.add(new BarEntry(getMonthIndex(result.value), (float) result.decibel));
-            }
-
-            BarDataSet dataSet = new BarDataSet(entries, "Dati di prova");
-
-
-            BarData barData = new BarData(dataSet);
-
-            chart.setData(barData);
-            chart.post(() -> chart.invalidate());
-        }).start();
-
     }
 
     private int getMonthIndex(String month) {
@@ -155,4 +157,32 @@ public class StatisticFragment extends Fragment {
 
         return 0;
     }
+
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
+
+        new Thread(() -> {
+            AppDatabase db = AppDatabase.getDatabaseInstance(getContext());
+            List<RecordingDAO.Result> results =  db.recordingDAO().getAvgPerMonth(cursor.getString(0));
+
+            List<BarEntry> entries = new ArrayList<>();
+
+            for (RecordingDAO.Result result : results) {
+                entries.add(new BarEntry(getMonthIndex(result.value), (float) result.decibel));
+            }
+
+            BarDataSet dataSet = new BarDataSet(entries, "Dati di prova");
+
+
+            BarData barData = new BarData(dataSet);
+
+            chart.setData(barData);
+            chart.post(() -> chart.invalidate());
+        }).start();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {}
 }
