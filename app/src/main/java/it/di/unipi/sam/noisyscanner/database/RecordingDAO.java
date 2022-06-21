@@ -12,17 +12,8 @@ public interface RecordingDAO {
     @Query("SELECT * FROM Recording ORDER BY timestamp DESC LIMIT :limit")
     List<Recording> getRecentRecordings(int limit);
 
-    @Query("SELECT city AS value, max(decibel) AS decibel FROM Recording")
-    Result getLoudestCity();
-
-    @Query("SELECT strftime('%m', timestamp) AS value, max(decibel) AS decibel FROM Recording")
-    Result getLoudestMonth();
-
-    @Query("SELECT strftime('%d-%m-%Y', timestamp) AS value, MAX(decibel) AS decibel FROM Recording")
-    Result getLoudestDay();
-
-    @Query("SELECT strftime('%H', timestamp) AS value, MAX(decibel) AS decibel FROM Recording")
-    Result getLoudestHour();
+    @Query("SELECT strftime('%d-%m-%Y %H:%M', timestamp) AS dayhour, city, MAX(decibel) AS decibel FROM Recording")
+    LoudestCity getLoudestDay();
 
     @Query("INSERT INTO Recording (decibel, city) VALUES (:decibel, :city)")
     void insertRecording(double decibel, String city);
@@ -36,6 +27,12 @@ public interface RecordingDAO {
 
     static class Result {
         public String value;
+        public double decibel;
+    }
+
+    static class LoudestCity {
+        public String dayhour;
+        public String city;
         public double decibel;
     }
 }

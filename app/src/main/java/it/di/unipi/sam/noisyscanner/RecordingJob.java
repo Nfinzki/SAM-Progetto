@@ -24,9 +24,9 @@ public class RecordingJob implements Runnable {
     private final FusedLocationProviderClient fusedLocationClient;
     private final Geocoder geocoder;
     private final AppDatabase db;
-    private final RecordingService.OnNewDataListener newDataListener;
+    private final List<RecordingService.OnNewDataListener> newDataListener;
 
-    public RecordingJob(Context context, FusedLocationProviderClient fusedLocationClient, Geocoder geocoder, RecordingService.OnNewDataListener dataListener) {
+    public RecordingJob(Context context, FusedLocationProviderClient fusedLocationClient, Geocoder geocoder, List<RecordingService.OnNewDataListener> dataListener) {
         this.context = context;
         this.fusedLocationClient = fusedLocationClient;
         this.geocoder = geocoder;
@@ -123,7 +123,8 @@ public class RecordingJob implements Runnable {
                 new Thread(() -> db.recordingDAO().insertRecording(finalAvgDecibels, finalRegisteredLocation)
                 ).start();
 
-                newDataListener.onNewData(finalAvgDecibels, "12-06-2022 12:20:22", finalRegisteredLocation); //TODO Aggiungere il timestamp
+                for (RecordingService.OnNewDataListener lst : newDataListener)
+                    lst.onNewData(finalAvgDecibels, "12-06-2022 12:20:22", finalRegisteredLocation); //TODO Aggiungere il timestamp
             });
         }
     }
@@ -137,6 +138,8 @@ public class RecordingJob implements Runnable {
 
     private void addRecWithNoLocation(double avgDecibels) {
         db.recordingDAO().insertRecording(avgDecibels, (String)context.getText(R.string.location_not_available));
-        newDataListener.onNewData(avgDecibels, "TimeStamp", (String) context.getText(R.string.location_not_available)); //TODO Aggiungere il timestamp
+
+        for (RecordingService.OnNewDataListener lst : newDataListener)
+            lst.onNewData(avgDecibels, "TimeStamp", (String) context.getText(R.string.location_not_available)); //TODO Aggiungere il timestamp
     }
 }

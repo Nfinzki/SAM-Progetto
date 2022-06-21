@@ -33,6 +33,9 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             recordingService = (RecordingService.RecordingBinder) iBinder;
+
+            recordingService.setOnNewDataListner(RecordingFragment.this)
+                    .setOnStateChangedListner(RecordingFragment.this);
         }
 
         @Override
@@ -93,7 +96,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         if (recordingService != null) {
             switch (recordingService.getState()) {
                 case RecordingService.STOPPED:
-                    recordingService.startRecording(view.getContext(), this, this);
+                    recordingService.startRecording(view.getContext());
                     break;
                 case RecordingService.RECORDING:
                     recordingService.stopRecording();

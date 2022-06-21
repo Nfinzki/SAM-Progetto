@@ -17,6 +17,9 @@ import androidx.core.app.NotificationCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RecordingService extends Service {
     public static final int STOPPED = 0;
     public static final int RECORDING = 1;
@@ -29,27 +32,39 @@ public class RecordingService extends Service {
 
     private int state = STOPPED; //Not recording
     private Thread thread = null;
-    private OnStateChangedListener listener;
+    private List<OnStateChangedListener> listener = new ArrayList<>();
+    private List<OnNewDataListener> newDataListener = new ArrayList<>();
 
     private final int notificationId = 1;
 
     public class RecordingBinder extends Binder {
 
-        void startRecording(Context context, OnStateChangedListener lst, OnNewDataListener dataListener) {
-            listener = lst;
+        void startRecording(Context context) {
 
             Notification notification = builder.build();
 
             startForeground(notificationId, notification);
 
-            thread = new Thread(new RecordingJob(context, fusedLocationClient, geocoder, dataListener));
+            thread = new Thread(new RecordingJob(context, fusedLocationClient, geocoder, newDataListener));
             thread.start();
             state = RECORDING; //Recording
-            listener.onStateChanged(state);
+
+            for (OnStateChangedListener lst : listener)
+                lst.onStateChanged(state);
         }
 
         void stopRecording() {
             stop();
+        }
+
+        RecordingBinder setOnStateChangedListner(OnStateChangedListener lst) {
+            listener.add(lst);
+            return this;
+        }
+
+        RecordingBinder setOnNewDataListner(OnNewDataListener dataListner) {
+            newDataListener.add(dataListner);
+            return this;
         }
 
         int getState() {
@@ -99,7 +114,9 @@ public class RecordingService extends Service {
         if (thread != null) {
             thread.interrupt();
             state = STOPPED;
-            listener.onStateChanged(state);
+
+            for (OnStateChangedListener lst : listener)
+                lst.onStateChanged(state);
         }
 
         notificationManager.cancel(notificationId);
@@ -120,6 +137,8 @@ public class RecordingService extends Service {
 
         stopForeground(true);
         state = STOPPED; //Not recording
-        listener.onStateChanged(state);
+
+        for (OnStateChangedListener lst : listener)
+            lst.onStateChanged(state);
     }
 }
