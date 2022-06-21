@@ -1,5 +1,6 @@
 package it.di.unipi.sam.noisyscanner;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.St
 
     private final int numStatistics = 4;
 
+    private Context context = null;
+
     public void setData(RecordingDAO.Result loudestHour, RecordingDAO.Result loudestDay, RecordingDAO.Result loudestMonth, RecordingDAO.Result loudestCity) {
         this.loudestHour = loudestHour;
         this.loudestDay = loudestDay;
@@ -29,33 +32,34 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.St
     @Override
     public StatisticsAdapter.StatisticViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.statistic_item, parent, false);
+        context = view.getContext();
         return new StatisticsAdapter.StatisticViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull StatisticsAdapter.StatisticViewHolder holder, int position) {
-        String title = null;
+        CharSequence title = null;
         String value = null;
         String maxDecibel = null;
 
         switch (position) {
             case 0:
-                title = "Loudest Hour";
+                title = context.getText(R.string.loudest_hour);
                 value = loudestHour.value;
                 maxDecibel = loudestHour.decibel + " Db";
                 break;
             case 1:
-                title = "Loudest Day";
+                title = context.getText(R.string.loudest_day);
                 value = loudestDay.value;
                 maxDecibel = loudestDay.decibel + " Db";
                 break;
             case 2:
-                title = "Loudest Month";
+                title = context.getText(R.string.loudest_month);
                 value = loudestMonth.value;
                 maxDecibel = loudestMonth.decibel + " Db";
                 break;
             case 3:
-                title = "Loudest City";
+                title = context.getText(R.string.loudest_city);
                 value = loudestCity.value;
                 maxDecibel = loudestCity.decibel + " Db";
                 break;

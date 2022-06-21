@@ -1,5 +1,7 @@
 package it.di.unipi.sam.noisyscanner.database;
 
+import android.database.Cursor;
+
 import androidx.room.Dao;
 import androidx.room.Query;
 
@@ -29,8 +31,8 @@ public interface RecordingDAO {
             "WHERE strftime('%Y', timestamp) = :year GROUP BY value")
     List<Result> getAvgPerMonth(String year);
 
-    @Query("SELECT strftime('%Y', timestamp) AS years FROM Recording GROUP BY years ORDER BY years")
-    List<String> getAllYears();
+    @Query("SELECT strftime('%Y', timestamp) AS _id FROM Recording GROUP BY _id ORDER BY _id DESC")
+    Cursor getAllYears();
 
     static class Result {
         public String value;

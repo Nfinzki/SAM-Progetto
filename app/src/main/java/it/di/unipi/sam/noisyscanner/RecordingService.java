@@ -30,17 +30,14 @@ public class RecordingService extends Service {
     private int state = STOPPED; //Not recording
     private Thread thread = null;
     private OnStateChangedListener listener;
-    private View view;
 
     private final int notificationId = 1;
 
     public class RecordingBinder extends Binder {
 
-        void startRecording(View v, OnStateChangedListener lst, OnNewDataListener dataListener) {
-            view = v;
+        void startRecording(Context context, OnStateChangedListener lst, OnNewDataListener dataListener) {
             listener = lst;
 
-            Context context = view.getContext();
             Notification notification = builder.build();
 
             startForeground(notificationId, notification);
@@ -48,7 +45,7 @@ public class RecordingService extends Service {
             thread = new Thread(new RecordingJob(context, fusedLocationClient, geocoder, dataListener));
             thread.start();
             state = RECORDING; //Recording
-            listener.onStateChanged(view, state);
+            listener.onStateChanged(state);
         }
 
         void stopRecording() {
@@ -90,6 +87,7 @@ public class RecordingService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d("SERVICE", "onBind");
         return binder;
     }
 
@@ -101,14 +99,14 @@ public class RecordingService extends Service {
         if (thread != null) {
             thread.interrupt();
             state = STOPPED;
-            listener.onStateChanged(view, state);
+            listener.onStateChanged(state);
         }
 
         notificationManager.cancel(notificationId);
     }
 
     public interface OnStateChangedListener {
-        void onStateChanged(View view, int state);
+        void onStateChanged(int state);
     }
 
     public interface OnNewDataListener {
@@ -122,6 +120,6 @@ public class RecordingService extends Service {
 
         stopForeground(true);
         state = STOPPED; //Not recording
-        listener.onStateChanged(view, state);
+        listener.onStateChanged(state);
     }
 }

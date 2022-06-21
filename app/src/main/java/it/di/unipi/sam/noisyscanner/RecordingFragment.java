@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.IBinder;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,11 +40,16 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
             recordingService = null;
         }
     };
-    private final int maxLastRecordings = 20;
 
-    public static Fragment newInstance() {
-        RecordingFragment rf = new RecordingFragment();
-        return rf;
+    private static RecordingFragment INSTANCE = null;
+    private final int maxLastRecordings = 20;
+    private FloatingActionButton button = null;
+
+    public static Fragment getInstance() {
+        if (INSTANCE == null)
+            INSTANCE = new RecordingFragment();
+
+        return INSTANCE;
     }
 
     @Override
@@ -55,10 +61,18 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        Log.d("FRAG_LC", "onViewCreated");
+
         Context context = view.getContext();
         context.bindService(new Intent(context, RecordingService.class), recordingConnection, Context.BIND_AUTO_CREATE);
 
-        FloatingActionButton button = (FloatingActionButton) view.findViewById(R.id.micButton);
+        button = (FloatingActionButton) view.findViewById(R.id.micButton);
+        if (recordingService != null) {
+            if (recordingService.getState() == RecordingService.RECORDING)
+                button.setImageResource(R.drawable.ic_stop);
+            else
+                button.setImageResource(R.drawable.ic_microphone);
+        }
         button.setOnClickListener(this);
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recent_recordings);
@@ -66,6 +80,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         RecordingAdapter adapter = new RecordingAdapter();
         recyclerView.setAdapter(adapter);
+
         new Thread(() -> {
             List<Recording> recordings = AppDatabase.getDatabaseInstance(context).recordingDAO().getRecentRecordings(maxLastRecordings);
             adapter.setRecordings(recordings);
@@ -78,7 +93,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         if (recordingService != null) {
             switch (recordingService.getState()) {
                 case RecordingService.STOPPED:
-                    recordingService.startRecording(view, this, this);
+                    recordingService.startRecording(view.getContext(), this, this);
                     break;
                 case RecordingService.RECORDING:
                     recordingService.stopRecording();
@@ -87,9 +102,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
     }
 
     @Override
-    public void onStateChanged(View view, int state) {
-        FloatingActionButton button = (FloatingActionButton)view.findViewById(R.id.micButton);
-
+    public void onStateChanged(int state) {
         switch (state) {
             case RecordingService.STOPPED:
                 button.setImageResource(R.drawable.ic_microphone);
@@ -101,10 +114,11 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onNewData(double decibel, String timestamp, String city) {
-        FragmentManager fm = requireActivity().getSupportFragmentManager();
+        if (getActivity() == null) return;
 
         if (((MainActivity)getActivity()).getVisibility()) {
             ResultDialog resultDialog = new ResultDialog(decibel, timestamp, city);
+            FragmentManager fm = getActivity().getSupportFragmentManager();
             resultDialog.show(fm, "Result Dialog");
         }
 

@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
             chipNavigationBar.setItemSelected(R.id.recording, true);
 
             getSupportFragmentManager().beginTransaction()
-                .replace(R.id.placeholder, RecordingFragment.newInstance())
+                .replace(R.id.placeholder, RecordingFragment.getInstance())
                 .commit();
         } else {
             Log.d("ON_CREATE", "savedInstanceState = " + savedInstanceState.get("ChipNavBar"));
@@ -43,11 +43,11 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
             Fragment fragment = null;
             switch (savedInstanceState.getInt("ChipNavBar")) {
                 case R.id.recording: {
-                    fragment = RecordingFragment.newInstance();
+                    fragment = RecordingFragment.getInstance();
                     break;
                 }
                 case R.id.statistics:
-                    fragment = StatisticFragment.newInstance();
+                    fragment = StatisticFragment.getInstance();
                     break;
             }
 
@@ -91,16 +91,27 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
     }
 
     @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d("ACTIVITY_LC", "onSaveInstanceState");
+
+        if ((int) savedInstanceState.get("ChipNavBar") == R.id.recording)
+            chipNavigationBar.setItemSelected(R.id.recording, true);
+        else
+            chipNavigationBar.setItemSelected(R.id.statistics, true);
+    }
+
+    @Override
     public void onItemSelected(int i) {
         Fragment fragment = null;
 
         switch (i) {
             case R.id.recording:
-                fragment = RecordingFragment.newInstance();
+                fragment = RecordingFragment.getInstance();
                 break;
 
             case R.id.statistics:
-                fragment = StatisticFragment.newInstance();
+                fragment = StatisticFragment.getInstance();
                 break;
         }
 
