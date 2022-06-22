@@ -143,7 +143,7 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setDrawGridLines(false);
-        xAxis.setTextSize(12);
+        xAxis.setTextSize(11);
         if (isDarkTheme()) xAxis.setTextColor(getColor(R.color.grey));
 
         chart.getAxisRight().setEnabled(false);

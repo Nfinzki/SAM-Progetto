@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
 
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .replace(R.id.placeholder, fragment)
                     .commit();
         }
