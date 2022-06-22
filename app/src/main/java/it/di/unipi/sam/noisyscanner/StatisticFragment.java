@@ -4,11 +4,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,6 +40,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.card.MaterialCardView;
 
 import java.text.SimpleDateFormat;
@@ -140,11 +143,18 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setDrawGridLines(false);
+        xAxis.setTextSize(12);
+        if (isDarkTheme()) xAxis.setTextColor(getColor(R.color.grey));
 
-        YAxis yAxis = chart.getAxisRight();
-        yAxis.setEnabled(false);
+        chart.getAxisRight().setEnabled(false);
 
-        chart.getLegend().setEnabled(false);
+        chart.getAxisLeft().setTextSize(12);
+        if (isDarkTheme()) chart.getAxisLeft().setTextColor(getColor(R.color.grey));
+
+        chart.getLegend().setEnabled(true);
+        chart.getLegend().setTextSize(15);
+        if (isDarkTheme()) chart.getLegend().setTextColor(getColor(R.color.grey));
+
 
         Resources res = getResources();
 
@@ -177,6 +187,20 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
         return 0;
     }
 
+    private boolean isDarkTheme() {
+        switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                return true;
+            case Configuration.UI_MODE_NIGHT_NO:
+                return false;
+        }
+
+        return false;
+    }
+
+    private int getColor(int colorRes) {
+        return ContextCompat.getColor(getContext(), colorRes);
+    }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -192,7 +216,11 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
                 entries.add(new BarEntry(getMonthIndex(result.value), (float) result.decibel));
             }
 
-            BarDataSet dataSet = new BarDataSet(entries, "Dati di prova");
+            BarDataSet dataSet = new BarDataSet(entries, getText(R.string.decibelAvg).toString());
+
+            dataSet.setColors(getColor(R.color.material_light_orange));
+            dataSet.setValueTextSize(15);
+            if (isDarkTheme()) dataSet.setValueTextColor(getColor(R.color.grey));
 
 
             BarData barData = new BarData(dataSet);
@@ -228,7 +256,10 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
                     entries.add(new BarEntry(getMonthIndex(result.value), (float) result.decibel));
                 }
 
-                BarDataSet dataSet = new BarDataSet(entries, "Dati di prova");
+                BarDataSet dataSet = new BarDataSet(entries, getText(R.string.decibelAvg).toString());
+
+                dataSet.setColors(ContextCompat.getColor(getContext(), R.color.material_light_orange));
+                dataSet.setValueTextSize(15);
 
 
                 BarData barData = new BarData(dataSet);

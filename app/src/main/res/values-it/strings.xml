@@ -13,4 +13,5 @@
     <string name="city">Città: </string>
     <string name="timestamp">Data e ora: </string>
     <string name="stop">Stop</string>
+    <string name="decibelAvg">Decibel medi</string>
 </resources>
