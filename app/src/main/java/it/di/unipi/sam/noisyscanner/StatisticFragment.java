@@ -215,20 +215,31 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
             resultDialog.show(fm, "Result Dialog");
         }
 
-//        BarChart barChart = requireView().findViewById(R.id.chart);
-//        Spinner spi = requireView().findViewById(R.id.yearSpinner);
-//
-//        RecordingAdapter ra = (RecordingAdapter) rv.getAdapter();
-//        new Thread(() -> {
-//            List<Recording> recordings = AppDatabase.getDatabaseInstance(getContext()).recordingDAO().getRecentRecordings(maxLastRecordings);
-//
-//            rv.post(() -> {
-//                if (ra != null) {
-//                    ra.setRecordings(recordings);
-//                    ra.notifyDataSetChanged();
-//                }
-//            });
-//        }).start();
+        String selectedItem = ((Cursor) spinner.getSelectedItem()).getString(0);
+
+        if (selectedItem.equals(timestamp.substring(0, 4))) {
+            new Thread(() -> {
+                AppDatabase db = AppDatabase.getDatabaseInstance(getContext());
+                List<RecordingDAO.Result> results =  db.recordingDAO().getAvgPerMonth(selectedItem);
+
+                List<BarEntry> entries = new ArrayList<>();
+
+                for (RecordingDAO.Result result : results) {
+                    entries.add(new BarEntry(getMonthIndex(result.value), (float) result.decibel));
+                }
+
+                BarDataSet dataSet = new BarDataSet(entries, "Dati di prova");
+
+
+                BarData barData = new BarData(dataSet);
+
+                chart.setData(barData);
+                chart.post(() -> {
+                    chart.notifyDataSetChanged();
+                    chart.invalidate();
+                });
+            }).start();
+        }
 
     }
 }
