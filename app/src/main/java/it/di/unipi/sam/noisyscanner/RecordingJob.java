@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import it.di.unipi.sam.noisyscanner.database.AppDatabase;
@@ -25,6 +26,8 @@ public class RecordingJob implements Runnable {
     private final Geocoder geocoder;
     private final AppDatabase db;
     private final List<RecordingService.OnNewDataListener> newDataListener;
+
+    private String timestamp;
 
     public RecordingJob(Context context, FusedLocationProviderClient fusedLocationClient, Geocoder geocoder, List<RecordingService.OnNewDataListener> dataListener) {
         this.context = context;
@@ -120,11 +123,15 @@ public class RecordingJob implements Runnable {
                 }
 
                 String finalRegisteredLocation = registeredLocation;
-                new Thread(() -> db.recordingDAO().insertRecording(finalAvgDecibels, finalRegisteredLocation)
+                timestamp = getTimestamp();
+                Log.d("TIMESTAMP", timestamp);
+                new Thread(() -> db.recordingDAO().insertRecording(finalAvgDecibels, finalRegisteredLocation, timestamp)
                 ).start();
 
+
+
                 for (RecordingService.OnNewDataListener lst : newDataListener)
-                    lst.onNewData(finalAvgDecibels, "12-06-2022 12:20:22", finalRegisteredLocation); //TODO Aggiungere il timestamp
+                    lst.onNewData(finalAvgDecibels, timestamp, finalRegisteredLocation);
             });
         }
     }
@@ -136,10 +143,17 @@ public class RecordingJob implements Runnable {
         return  20 * Math.log10((double) Math.abs(maxAmplitude));
     }
 
+    private String getTimestamp() {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        Log.d("RAW_TIMESTAMP", timestamp.toString());
+        return timestamp.toString();
+    }
+
     private void addRecWithNoLocation(double avgDecibels) {
-        db.recordingDAO().insertRecording(avgDecibels, (String)context.getText(R.string.location_not_available));
+        timestamp = getTimestamp();
+        db.recordingDAO().insertRecording(avgDecibels, (String)context.getText(R.string.location_not_available), timestamp);
 
         for (RecordingService.OnNewDataListener lst : newDataListener)
-            lst.onNewData(avgDecibels, "TimeStamp", (String) context.getText(R.string.location_not_available)); //TODO Aggiungere il timestamp
+            lst.onNewData(avgDecibels, timestamp, (String) context.getText(R.string.location_not_available));
     }
 }
