@@ -9,14 +9,15 @@ import java.util.List;
 
 @Dao
 public interface RecordingDAO {
-    @Query("SELECT * FROM Recording ORDER BY timestamp DESC LIMIT :limit")
+    @Query("SELECT rId, strftime('%d-%m-%Y %H:%M', timestamp) AS timestamp, decibel, city " +
+            "FROM Recording ORDER BY Recording.timestamp DESC LIMIT :limit")
     List<Recording> getRecentRecordings(int limit);
 
     @Query("SELECT strftime('%d-%m-%Y %H:%M', timestamp) AS dayhour, city, MAX(decibel) AS decibel FROM Recording")
     LoudestCity getLoudestDay();
 
-    @Query("INSERT INTO Recording (decibel, city) VALUES (:decibel, :city)")
-    void insertRecording(double decibel, String city);
+    @Query("INSERT INTO Recording (decibel, city, timestamp) VALUES (:decibel, :city, :timestamp)")
+    void insertRecording(double decibel, String city, String timestamp);
 
     @Query("SELECT strftime('%m', timestamp) AS value, AVG(decibel) AS decibel FROM Recording " +
             "WHERE strftime('%Y', timestamp) = :year GROUP BY value")

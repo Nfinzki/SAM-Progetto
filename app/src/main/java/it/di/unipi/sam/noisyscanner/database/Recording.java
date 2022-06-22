@@ -12,9 +12,7 @@ public class Recording {
     @PrimaryKey(autoGenerate = true)
     public int rId;
 
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
     public String timestamp;
-
     public double decibel;
     public String city;
 
