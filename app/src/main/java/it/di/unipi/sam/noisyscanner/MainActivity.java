@@ -31,31 +31,10 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
             Log.d("ON_CREATE", "savedInstanceState = null");
 
             chipNavigationBar.setItemSelected(R.id.recording, true);
-
-            getSupportFragmentManager().beginTransaction()
-                .replace(R.id.placeholder, RecordingFragment.getInstance())
-                .commit();
         } else {
             Log.d("ON_CREATE", "savedInstanceState = " + savedInstanceState.get("ChipNavBar"));
 
             chipNavigationBar.setItemSelected(savedInstanceState.getInt("ChipNavBar"), true);
-
-            Fragment fragment = null;
-            switch (savedInstanceState.getInt("ChipNavBar")) {
-                case R.id.recording: {
-                    fragment = RecordingFragment.getInstance();
-                    break;
-                }
-                case R.id.statistics:
-                    fragment = StatisticFragment.getInstance();
-                    break;
-            }
-
-            if (fragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.placeholder, fragment)
-                        .commit();
-            }
         }
 
         createNotificationChannel();
