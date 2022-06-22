@@ -260,7 +260,7 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
 
                 dataSet.setColors(ContextCompat.getColor(getContext(), R.color.material_light_orange));
                 dataSet.setValueTextSize(15);
-
+                if (isDarkTheme()) dataSet.setValueTextColor(getColor(R.color.grey));
 
                 BarData barData = new BarData(dataSet);
 
