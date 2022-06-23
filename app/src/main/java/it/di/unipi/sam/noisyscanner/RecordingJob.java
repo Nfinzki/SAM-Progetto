@@ -91,7 +91,9 @@ public class RecordingJob implements Runnable {
             avgDecibels = (double) Math.round(avgDecibels * 100d) / 100d;
             Log.d("Db AVG rounded", avgDecibels + "");
         } else {
-            //TODO Show Dialog che non è stato rilevato nulla
+            for (RecordingService.OnNewDataListener lst : newDataListener)
+                lst.onFail();
+            return;
         }
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

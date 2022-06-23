@@ -34,7 +34,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             recordingService = (RecordingService.RecordingBinder) iBinder;
 
-            recordingService.setOnNewDataListner(RecordingFragment.this)
+            recordingService.setOnNewDataListener(RecordingFragment.this)
                     .setOnStateChangedListner(RecordingFragment.this);
         }
 
@@ -139,5 +139,16 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
             });
         }).start();
 
+    }
+
+    @Override
+    public void onFail() {
+        if (getActivity() == null) return;
+
+        if (((MainActivity)getActivity()).getVisibility()) {
+            NoAudioDialog noAudioDialog = new NoAudioDialog();
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            noAudioDialog.show(fm, "No Audio");
+        }
     }
 }

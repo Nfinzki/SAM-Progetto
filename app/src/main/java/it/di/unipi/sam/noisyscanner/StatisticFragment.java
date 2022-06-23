@@ -7,50 +7,35 @@ import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
 import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.IBinder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.card.MaterialCardView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import it.di.unipi.sam.noisyscanner.database.AppDatabase;
-import it.di.unipi.sam.noisyscanner.database.Recording;
 import it.di.unipi.sam.noisyscanner.database.RecordingDAO;
 
 /**
@@ -64,7 +49,7 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             recordingService = (RecordingService.RecordingBinder) iBinder;
-            recordingService.setOnNewDataListner(StatisticFragment.this);
+            recordingService.setOnNewDataListener(StatisticFragment.this);
         }
 
         @Override
@@ -271,6 +256,16 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
                 });
             }).start();
         }
+    }
 
+    @Override
+    public void onFail() {
+        if (getActivity() == null) return;
+
+        if (((MainActivity)getActivity()).getVisibility()) {
+            NoAudioDialog noAudioDialog = new NoAudioDialog();
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            noAudioDialog.show(fm, "No Audio");
+        }
     }
 }

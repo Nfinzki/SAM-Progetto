@@ -14,4 +14,6 @@
     <string name="timestamp">Data e ora: </string>
     <string name="stop">Stop</string>
     <string name="decibelAvg">Decibel medi</string>
+    <string name="results">Risultati</string>
+    <string name="noAudio">Noisy Scanner non ha sentito niente</string>
 </resources>

@@ -32,8 +32,8 @@ public class RecordingService extends Service {
 
     private int state = STOPPED; //Not recording
     private Thread thread = null;
-    private List<OnStateChangedListener> listener = new ArrayList<>();
-    private List<OnNewDataListener> newDataListener = new ArrayList<>();
+    private final List<OnStateChangedListener> listener = new ArrayList<>();
+    private final List<OnNewDataListener> newDataListener = new ArrayList<>();
 
     private final int notificationId = 1;
 
@@ -62,7 +62,7 @@ public class RecordingService extends Service {
             return this;
         }
 
-        RecordingBinder setOnNewDataListner(OnNewDataListener dataListner) {
+        RecordingBinder setOnNewDataListener(OnNewDataListener dataListner) {
             newDataListener.add(dataListner);
             return this;
         }
@@ -128,6 +128,8 @@ public class RecordingService extends Service {
 
     public interface OnNewDataListener {
         void onNewData(double decibel, String timestamp, String city);
+
+        void onFail();
     }
 
     public void stop() {
