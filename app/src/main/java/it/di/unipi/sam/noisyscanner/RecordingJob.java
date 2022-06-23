@@ -127,10 +127,8 @@ public class RecordingJob implements Runnable {
                 String finalRegisteredLocation = registeredLocation;
                 timestamp = getTimestamp();
                 Log.d("TIMESTAMP", timestamp);
-                new Thread(() -> db.recordingDAO().insertRecording(finalAvgDecibels, finalRegisteredLocation, timestamp)
-                ).start();
-
-
+                new Thread(() -> db.recordingDAO().insertRecording(finalAvgDecibels, finalRegisteredLocation, timestamp))
+                        .start();
 
                 for (RecordingService.OnNewDataListener lst : newDataListener)
                     lst.onNewData(finalAvgDecibels, timestamp, finalRegisteredLocation);

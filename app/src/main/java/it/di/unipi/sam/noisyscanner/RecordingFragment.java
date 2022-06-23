@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.IBinder;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +34,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
             recordingService = (RecordingService.RecordingBinder) iBinder;
 
             recordingService.setOnNewDataListener(RecordingFragment.this)
-                    .setOnStateChangedListner(RecordingFragment.this);
+                    .setOnStateChangedListener(RecordingFragment.this);
         }
 
         @Override
@@ -45,6 +44,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
     };
 
     private static RecordingFragment INSTANCE = null;
+
     private final int maxLastRecordings = 20;
     private FloatingActionButton button = null;
 
@@ -58,15 +58,12 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("FRAG_LC", "onCreateView");
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_recording, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        Log.d("FRAG_LC", "onViewCreated");
-
         Context context = view.getContext();
         context.bindService(new Intent(context, RecordingService.class), recordingConnection, Context.BIND_AUTO_CREATE);
 
@@ -85,23 +82,19 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         RecordingAdapter adapter = new RecordingAdapter();
         recyclerView.setAdapter(adapter);
 
-        new Thread(() -> {
-            List<Recording> recordings = AppDatabase.getDatabaseInstance(context).recordingDAO().getRecentRecordings(maxLastRecordings);
-            adapter.setRecordings(recordings);
-            recyclerView.post(() -> adapter.notifyDataSetChanged());
-        }).start();
+        refreshData(context, recyclerView, adapter);
     }
 
     @Override
     public void onClick(View view) {
-        if (recordingService != null) {
-            switch (recordingService.getState()) {
-                case RecordingService.STOPPED:
-                    recordingService.startRecording(view.getContext());
-                    break;
-                case RecordingService.RECORDING:
-                    recordingService.stopRecording();
-            }
+        if (recordingService == null) return;
+
+        switch (recordingService.getState()) {
+            case RecordingService.STOPPED:
+                recordingService.startRecording(view.getContext());
+                break;
+            case RecordingService.RECORDING:
+                recordingService.stopRecording();
         }
     }
 
@@ -128,17 +121,8 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
 
         RecyclerView rv = requireView().findViewById(R.id.recent_recordings);
         RecordingAdapter ra = (RecordingAdapter) rv.getAdapter();
-        new Thread(() -> {
-            List<Recording> recordings = AppDatabase.getDatabaseInstance(getContext()).recordingDAO().getRecentRecordings(maxLastRecordings);
 
-            rv.post(() -> {
-                if (ra != null) {
-                    ra.setRecordings(recordings);
-                    ra.notifyDataSetChanged();
-                }
-            });
-        }).start();
-
+        refreshData(getContext(), rv, ra);
     }
 
     @Override
@@ -150,5 +134,19 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
             FragmentManager fm = getActivity().getSupportFragmentManager();
             noAudioDialog.show(fm, "No Audio");
         }
+    }
+
+    private void refreshData(Context context, RecyclerView recyclerView, RecordingAdapter adapter) {
+        new Thread(() -> {
+            AppDatabase db = AppDatabase.getDatabaseInstance(context);
+            List<Recording> recordings = db.recordingDAO().getRecentRecordings(maxLastRecordings);
+
+            recyclerView.post(() -> {
+                if (adapter == null) return;
+
+                adapter.setRecordings(recordings);
+                adapter.notifyDataSetChanged();
+            });
+        }).start();
     }
 }

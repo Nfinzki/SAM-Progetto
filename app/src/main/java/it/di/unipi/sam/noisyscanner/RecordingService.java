@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.location.Geocoder;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
-import android.view.View;
 
 import androidx.core.app.NotificationCompat;
 
@@ -57,13 +55,13 @@ public class RecordingService extends Service {
             stop();
         }
 
-        RecordingBinder setOnStateChangedListner(OnStateChangedListener lst) {
+        RecordingBinder setOnStateChangedListener(OnStateChangedListener lst) {
             listener.add(lst);
             return this;
         }
 
-        RecordingBinder setOnNewDataListener(OnNewDataListener dataListner) {
-            newDataListener.add(dataListner);
+        RecordingBinder setOnNewDataListener(OnNewDataListener dataListener) {
+            newDataListener.add(dataListener);
             return this;
         }
 
@@ -95,24 +93,22 @@ public class RecordingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("NOTIF_STOP", "Calling stop");
         stop();
         return START_NOT_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d("SERVICE", "onBind");
         return binder;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("REC_SERVICE", "Inside onDestroy");
 
         if (thread != null) {
             thread.interrupt();
+            thread = null;
             state = STOPPED;
 
             for (OnStateChangedListener lst : listener)
@@ -135,6 +131,7 @@ public class RecordingService extends Service {
     public void stop() {
         if (thread != null) {
             thread.interrupt();
+            thread = null;
         }
 
         stopForeground(true);

@@ -28,15 +28,10 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
         chipNavigationBar = findViewById(R.id.navigation_bar);
         chipNavigationBar.setOnItemSelectedListener(this);
 
-        if (savedInstanceState == null) {
-            Log.d("ON_CREATE", "savedInstanceState = null");
-
+        if (savedInstanceState == null)
             chipNavigationBar.setItemSelected(R.id.recording, true);
-        } else {
-            Log.d("ON_CREATE", "savedInstanceState = " + savedInstanceState.get("ChipNavBar"));
-
+        else
             chipNavigationBar.setItemSelected(savedInstanceState.getInt("ChipNavBar"), true);
-        }
 
         createNotificationChannel();
         checkAndRequestPermissions();
@@ -45,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("ACTIVITY_LC", "Inside onStop");
 
         visible = false;
     }
@@ -53,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("ACTIVITY_LC", "Inside onStart");
 
         visible = true;
     }
@@ -73,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d("ACTIVITY_LC", "onSaveInstanceState");
 
         if ((int) savedInstanceState.get("ChipNavBar") == R.id.recording)
             chipNavigationBar.setItemSelected(R.id.recording, true);
@@ -104,16 +96,14 @@ public class MainActivity extends AppCompatActivity implements ChipNavigationBar
     }
 
     private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.app_name);
             String description = getString(R.string.app_name);
+
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel("MyChannel", name, importance);
             channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
+
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }

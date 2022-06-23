@@ -38,11 +38,6 @@ import java.util.List;
 import it.di.unipi.sam.noisyscanner.database.AppDatabase;
 import it.di.unipi.sam.noisyscanner.database.RecordingDAO;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link StatisticFragment#} factory method to
- * create an instance of this fragment.
- */
 public class StatisticFragment extends Fragment implements AdapterView.OnItemSelectedListener, RecordingService.OnNewDataListener {
     private RecordingService.RecordingBinder recordingService = null;
     private final ServiceConnection recordingConnection = new ServiceConnection() {
@@ -62,6 +57,10 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
 
     private BarChart chart;
     private Spinner spinner;
+    private MaterialCardView cardView;
+    private TextView dayhour;
+    private TextView city;
+    private TextView maxDb;
 
     public static Fragment getInstance() {
         if (INSTANCE == null)
@@ -85,34 +84,15 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
 
         spinner = (Spinner) view.findViewById(R.id.yearSpinner);
         spinner.setOnItemSelectedListener(this);
-        SimpleCursorAdapter yearAdapter = new SimpleCursorAdapter(context,
-                android.R.layout.simple_spinner_item,
-                null,
-                new String[] {"_id"},
-                new int[] {android.R.id.text1});
 
         chart = (BarChart) view.findViewById(R.id.chart);
-        MaterialCardView cardView = view.findViewById(R.id.prova);
-        TextView dayhour = view.findViewById(R.id.dayhour);
-        TextView city = view.findViewById(R.id.loudest_city);
-        TextView maxDb = view.findViewById(R.id.maxDb);
 
-        new Thread(() -> {
-            AppDatabase db = AppDatabase.getDatabaseInstance(context);
+        cardView = view.findViewById(R.id.prova);
+        dayhour = view.findViewById(R.id.dayhour);
+        city = view.findViewById(R.id.loudest_city);
+        maxDb = view.findViewById(R.id.maxDb);
 
-            RecordingDAO.LoudestCity ld = db.recordingDAO().getLoudestDay();
-
-            Cursor cur = db.recordingDAO().getAllYears();
-            yearAdapter.changeCursor(cur);
-
-            cardView.post(() -> {
-               dayhour.setText(ld.dayhour);
-               city.setText(ld.city);
-               maxDb.setText(ld.decibel + " Db");
-            });
-            spinner.post(() -> spinner.setAdapter(yearAdapter));
-
-        }).start();
+        refreshLoudestCity(context);
 
         configureChart();
     }
@@ -191,28 +171,7 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
 
-        new Thread(() -> {
-            AppDatabase db = AppDatabase.getDatabaseInstance(getContext());
-            List<RecordingDAO.Result> results =  db.recordingDAO().getAvgPerMonth(cursor.getString(0));
-
-            List<BarEntry> entries = new ArrayList<>();
-
-            for (RecordingDAO.Result result : results) {
-                entries.add(new BarEntry(getMonthIndex(result.value), (float) result.decibel));
-            }
-
-            BarDataSet dataSet = new BarDataSet(entries, getText(R.string.decibelAvg).toString());
-
-            dataSet.setColors(getColor(R.color.material_light_orange));
-            dataSet.setValueTextSize(15);
-            if (isDarkTheme()) dataSet.setValueTextColor(getColor(R.color.grey));
-
-
-            BarData barData = new BarData(dataSet);
-
-            chart.setData(barData);
-            chart.post(() -> chart.invalidate());
-        }).start();
+        refreshChartData(cursor.getString(0));
     }
 
     @Override
@@ -228,33 +187,19 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
             resultDialog.show(fm, "Result Dialog");
         }
 
-        String selectedItem = ((Cursor) spinner.getSelectedItem()).getString(0);
+        refreshLoudestCity(getContext());
 
-        if (selectedItem.equals(timestamp.substring(0, 4))) {
-            new Thread(() -> {
-                AppDatabase db = AppDatabase.getDatabaseInstance(getContext());
-                List<RecordingDAO.Result> results =  db.recordingDAO().getAvgPerMonth(selectedItem);
+        Cursor cursor = (Cursor) spinner.getSelectedItem();
 
-                List<BarEntry> entries = new ArrayList<>();
+        String selectedItem;
+        if (cursor != null) {
+            selectedItem = cursor.getString(0);
 
-                for (RecordingDAO.Result result : results) {
-                    entries.add(new BarEntry(getMonthIndex(result.value), (float) result.decibel));
-                }
-
-                BarDataSet dataSet = new BarDataSet(entries, getText(R.string.decibelAvg).toString());
-
-                dataSet.setColors(ContextCompat.getColor(getContext(), R.color.material_light_orange));
-                dataSet.setValueTextSize(15);
-                if (isDarkTheme()) dataSet.setValueTextColor(getColor(R.color.grey));
-
-                BarData barData = new BarData(dataSet);
-
-                chart.setData(barData);
-                chart.post(() -> {
-                    chart.notifyDataSetChanged();
-                    chart.invalidate();
-                });
-            }).start();
+            if (selectedItem.equals(timestamp.substring(0, 4))) {
+                refreshChartData(selectedItem);
+            }
+        } else {
+            refreshChartData(timestamp.substring(0, 4));
         }
     }
 
@@ -267,5 +212,59 @@ public class StatisticFragment extends Fragment implements AdapterView.OnItemSel
             FragmentManager fm = getActivity().getSupportFragmentManager();
             noAudioDialog.show(fm, "No Audio");
         }
+    }
+
+    private void refreshLoudestCity(Context context) {
+        SimpleCursorAdapter yearAdapter = new SimpleCursorAdapter(context,
+                android.R.layout.simple_spinner_item,
+                null,
+                new String[] {"_id"},
+                new int[] {android.R.id.text1},
+                0);
+
+        new Thread(() -> {
+            AppDatabase db = AppDatabase.getDatabaseInstance(context);
+
+            RecordingDAO.LoudestCity ld = db.recordingDAO().getLoudestDay();
+
+            Cursor cur = db.recordingDAO().getAllYears();
+            yearAdapter.changeCursor(cur);
+
+            CharSequence maxDecibel = ld.decibel + " Db";
+            cardView.post(() -> {
+                dayhour.setText(ld.dayhour);
+                city.setText(ld.city);
+                maxDb.setText(maxDecibel);
+            });
+            spinner.post(() -> spinner.setAdapter(yearAdapter));
+
+        }).start();
+    }
+
+    private void refreshChartData(String selectedItem) {
+        new Thread(() -> {
+            AppDatabase db = AppDatabase.getDatabaseInstance(getContext());
+            List<RecordingDAO.Result> results =  db.recordingDAO().getAvgPerMonth(selectedItem);
+
+            List<BarEntry> entries = new ArrayList<>();
+
+            for (RecordingDAO.Result result : results) {
+                entries.add(new BarEntry(getMonthIndex(result.value), (float) result.decibel));
+            }
+
+            BarDataSet dataSet = new BarDataSet(entries, getText(R.string.decibelAvg).toString());
+
+            dataSet.setColors(getColor(R.color.material_light_orange));
+            dataSet.setValueTextSize(15);
+            if (isDarkTheme()) dataSet.setValueTextColor(getColor(R.color.grey));
+
+            BarData barData = new BarData(dataSet);
+
+            chart.setData(barData);
+            chart.post(() -> {
+                chart.notifyDataSetChanged();
+                chart.invalidate();
+            });
+        }).start();
     }
 }
