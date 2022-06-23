@@ -76,13 +76,11 @@ public class RecordingService extends Service {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         Intent intent = new Intent(getApplicationContext(), RecordingService.class);
-        Intent activityIntent = new Intent(getApplicationContext(), MainActivity.class);
 
         builder = new NotificationCompat.Builder(this, "MyChannel")
                 .setSmallIcon(R.drawable.ic_microphone)
                 .setContentTitle(getText(R.string.notification_title))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(PendingIntent.getActivity(this, 3, activityIntent, 0))
                 .addAction(R.drawable.ic_stop, getText(R.string.stop), PendingIntent.getService(this, 2, intent, 0))
                 .setOngoing(true);
 
